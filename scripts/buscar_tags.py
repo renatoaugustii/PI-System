@@ -2,12 +2,6 @@ import csv
 
 from lib.pi_connection import conectar_pi
 
-server = conectar_pi()
-
-print(
-    f"Conectado em: {server.Name}"
-)
-
 import clr
 
 from lib.config_manager import carregar_config
@@ -19,6 +13,10 @@ clr.AddReference(
 )
 
 from OSIsoft.AF.PI import PIPoint
+
+server = conectar_pi()
+
+print(f"Conectado em: {server.Name}")
 
 with open(
     "templates/equipamentos.txt",
@@ -52,7 +50,7 @@ with open(
     for equipamento in equipamentos:
 
         print(
-            f"Pesquisando: {equipamento}"
+            f"\nPesquisando: {equipamento}"
         )
 
         tags = list(
@@ -73,7 +71,5 @@ with open(
                 tag.Name
             ])
 
-print()
-print(
-    "Arquivo criado: resultado_tags.csv"
-)
+print("\nConcluído!")
+print("Arquivo gerado: resultado_tags.csv")

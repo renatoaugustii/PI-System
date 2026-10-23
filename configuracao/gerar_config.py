@@ -1,45 +1,111 @@
 import json
 import os
+from pathlib import Path
 
-print()
-print("=" * 50)
-print("GERADOR DE CONFIGURAÇÃO")
-print("=" * 50)
-print()
+# ==================================================
+# PROCURAR AF SDK
+# ==================================================
 
-dll_encontrada = None
-
-caminhos_comuns = [
+possiveis_caminhos = [
     r"C:\Program Files (x86)\PIPC\AF\PublicAssemblies\4.0\OSIsoft.AFSDK.dll",
     r"C:\Program Files\PIPC\AF\PublicAssemblies\4.0\OSIsoft.AFSDK.dll",
 ]
 
-for caminho in caminhos_comuns:
+afsdk_dll = None
+
+for caminho in possiveis_caminhos:
 
     if os.path.exists(caminho):
-        dll_encontrada = caminho
+        afsdk_dll = caminho
         break
 
-if dll_encontrada is None:
+if afsdk_dll is None:
 
-    print("AF SDK não encontrado.")
-    print()
+    print("\n[ERRO]")
+    print("OSIsoft.AFSDK.dll não encontrada.")
+    quit()
 
-    dll_encontrada = input(
-        "Informe o caminho da DLL: "
-    )
+print(f"\n[OK] AF SDK encontrada:")
+print(afsdk_dll)
 
-pi_server = input(
-    "Informe o PI Server (ex: pisystem-vitoria): "
-).strip()
+# ==================================================
+# CARREGAR SDK
+# ==================================================
+
+try:
+
+    import clr
+
+    clr.AddReference(afsdk_dll)
+
+    print("\n[OK] AF SDK carregada")
+
+except Exception as erro:
+
+    print("\n[ERRO] Falha ao carregar AF SDK")
+    print(erro)
+    quit()
+
+# ==================================================
+# LISTAR SERVIDORES PI
+# ==================================================
+
+from OSIsoft.AF.PI import PIServers
+
+servidores = PIServers()
+
+print("\nServidores encontrados:\n")
+
+lista_servidores = []
+
+for servidor in servidores:
+
+    lista_servidores.append(servidor.Name)
+
+for i, nome in enumerate(lista_servidores, start=1):
+
+    print(f"{i} - {nome}")
+
+# ==================================================
+# TESTAR CONEXÃO
+# ==================================================
+
+pi_server = None
+
+for nome in lista_servidores:
+
+    try:
+
+        servidor = servidores[nome]
+
+        servidor.Connect()
+
+        pi_server = nome
+
+        print(f"\n[OK] Conectado em: {nome}")
+
+        break
+
+    except:
+        pass
+
+if pi_server is None:
+
+    print("\n[ERRO]")
+    print("Nenhum PI Server acessível.")
+    quit()
+
+# ==================================================
+# CRIAR CONFIG
+# ==================================================
 
 config = {
-    "afsdk_dll": dll_encontrada,
+    "afsdk_dll": afsdk_dll,
     "pi_server": pi_server
 }
 
-os.makedirs(
-    "config",
+Path("config").mkdir(
+    parents=True,
     exist_ok=True
 )
 
@@ -52,9 +118,9 @@ with open(
     json.dump(
         config,
         f,
-        indent=4
+        indent=4,
+        ensure_ascii=False
     )
 
-print()
-print("Configuração salva em:")
+print("\n[OK] Configuração criada:")
 print("config/config.json")

@@ -21,3 +21,18 @@ venv/
 # Resultados
 resultado*.csv
 resultado*.xlsx
+
+config/config.json
+
+__pycache__/
+*.pyc
+
+logs/*
+
+resultado*.csv
+resultado*.xlsx
+
+.venv/
+venv/
+
+.vscode/

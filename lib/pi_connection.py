@@ -2,6 +2,7 @@ import clr
 
 from lib.config_manager import carregar_config
 
+
 def conectar_pi():
 
     cfg = carregar_config()
