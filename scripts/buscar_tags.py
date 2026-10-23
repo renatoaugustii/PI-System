@@ -1,3 +1,32 @@
+"""
+==============================================================================
+Script: buscar_tags.py
+==============================================================================
+
+Documentação
+------------
+
+docs/buscar_tags.md
+
+OBJETIVO
+Localizar e exportar as tags associadas aos equipamentos informados.
+
+ENTRADA
+templates/equipamentos.txt
+
+SAÍDA
+resultado_tags.csv
+
+==============================================================================
+"""
+
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+sys.path.insert(0, str(ROOT_DIR))
+
 import csv
 from datetime import datetime
 
