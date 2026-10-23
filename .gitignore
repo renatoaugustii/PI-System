@@ -1,0 +1,23 @@
+# Arquivos locais
+config/config.json
+
+# Logs
+logs/*
+!logs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+
+# Virtual Environment
+.venv/
+venv/
+
+# Resultados
+resultado*.csv
+resultado*.xlsx
