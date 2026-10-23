@@ -1,7 +1,14 @@
 import json
 import os
 
-print("\nVALIDAÇÃO DE AMBIENTE\n")
+print("=" * 60)
+print("VALIDAÇÃO DE AMBIENTE")
+print("=" * 60)
+print()
+
+# ==================================================
+# CONFIG
+# ==================================================
 
 try:
 
@@ -13,21 +20,90 @@ try:
 
         config = json.load(f)
 
-    print("[OK] config.json")
+    print("[OK] config/config.json encontrado")
 
-except:
+except Exception as erro:
 
-    print("[ERRO] config.json não encontrado")
+    print(
+        "[ERRO] Não foi possível carregar config.json"
+    )
+
+    print(erro)
+
     quit()
 
-afsdk = config["afsdk_dll"]
+# ==================================================
+# AF SDK
+# ==================================================
 
-if os.path.exists(afsdk):
+print()
+print("Validando AF SDK...")
 
-    print("[OK] AF SDK")
+afsdk = config.get(
+    "afsdk_dll"
+)
 
-else:
+if not afsdk:
 
-    print("[ERRO] AF SDK não encontrada")
+    print(
+        "[ERRO] afsdk_dll não encontrado"
+    )
 
-print(f"[OK] PI Server: {config['pi_server']}")
+    quit()
+
+if not os.path.exists(afsdk):
+
+    print(
+        "[ERRO] AF SDK não encontrada"
+    )
+
+    print(afsdk)
+
+    quit()
+
+print("[OK] AF SDK encontrada")
+print(afsdk)
+
+# ==================================================
+# SERVIDORES
+# ==================================================
+
+print()
+print("Validando servidores...")
+
+servidores = config.get(
+    "pi_servers",
+    []
+)
+
+if not servidores:
+
+    print(
+        "[ERRO] Nenhum servidor encontrado"
+    )
+
+    quit()
+
+print(
+    f"[OK] {len(servidores)} servidores encontrados"
+)
+
+print()
+
+for i, servidor in enumerate(
+    servidores,
+    start=1
+):
+
+    print(
+        f"{i} - {servidor}"
+    )
+
+# ==================================================
+# FINAL
+# ==================================================
+
+print()
+print("=" * 60)
+print("VALIDAÇÃO CONCLUÍDA")
+print("=" * 60)

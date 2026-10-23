@@ -47,19 +47,24 @@ python configuracao/gerar_config.py
 O script irá:
 
 - Localizar automaticamente o AF SDK
-- Identificar os servidores disponíveis
-- Testar a conectividade básica
+- Identificar os servidores PI disponíveis
 - Gerar o arquivo local de configuração
 
 ---
 
 # Validação do Ambiente
 
-Para validar a configuração atual:
+Para validar a configuração atual execute:
 
 ```bash
 python configuracao/validar_ambiente.py
 ```
+
+A validação verifica:
+
+- Arquivo de configuração local
+- AF SDK
+- Lista de servidores PI identificados
 
 ---
 
@@ -71,7 +76,48 @@ Após a configuração inicial será criado:
 config/config.json
 ```
 
+O arquivo armazena informações necessárias para execução das automações, como:
+
+- Caminho do AF SDK
+- Lista de servidores PI disponíveis
+
+Exemplo:
+
+```json
+{
+    "afsdk_dll": "C:\\Caminho\\Para\\OSIsoft.AFSDK.dll",
+    "pi_servers": [
+        "Servidor_01",
+        "Servidor_02"
+    ]
+}
+```
+
 Este arquivo contém configurações específicas da máquina do usuário e não deve ser versionado.
+
+---
+
+# Utilização dos Scripts
+
+Os scripts disponíveis encontram-se na pasta:
+
+```text
+scripts/
+```
+
+A documentação detalhada de cada automação encontra-se em:
+
+```text
+docs/
+```
+
+Os arquivos de entrada devem ser armazenados na pasta:
+
+```text
+templates/
+```
+
+A forma de execução, dependências, entradas e saídas de cada automação estão documentadas individualmente em seus respectivos arquivos de documentação.
 
 ---
 
@@ -89,14 +135,15 @@ Novos scripts devem possuir documentação própria dentro da pasta `docs`.
 
 # Desenvolvimento
 
-Ao criar novos scripts:
+Ao criar novas automações:
 
 1. Utilizar as configurações existentes em `config/config.json`
 2. Reutilizar funções compartilhadas da pasta `lib`
 3. Evitar caminhos fixos no código
 4. Não armazenar credenciais
-5. Documentar o script correspondente em `docs`
-6. Manter o README atualizado apenas com informações gerais do projeto
+5. Documentar cada automação em `docs`
+6. Manter o README focado apenas em informações gerais do projeto
+7. Seguir os padrões definidos para estrutura e organização do repositório
 
 ---
 
@@ -120,29 +167,32 @@ config/config.json
 
 Também não devem ser incluídos no repositório:
 
-- Nomes reais de servidores
+- Nomes reais de servidores utilizados em ambientes produtivos
 - Nomes reais de ativos
 - Tags de ambientes produtivos
 - Informações operacionais sensíveis
+- Arquivos contendo credenciais ou dados de acesso
 
 ---
 
 # Documentação
 
-A documentação detalhada de cada automação encontra-se na pasta:
+A documentação detalhada das automações encontra-se na pasta:
 
 ```text
 docs/
 ```
 
-Cada script deve possuir seu respectivo arquivo de documentação contendo:
+Cada documento deve conter, quando aplicável:
 
 - Objetivo
-- Entradas
-- Saídas
+- Arquivos de entrada
+- Arquivos de saída
 - Dependências
 - Forma de execução
+- Limitações
 - Observações relevantes
+- Histórico de alterações
 
 ---
 

@@ -1,10 +1,25 @@
 import json
 import os
 from pathlib import Path
+from datetime import datetime
+
+# ==================================================
+# INÍCIO
+# ==================================================
+
+inicio = datetime.now()
+
+print("=" * 60)
+print("CONFIGURAÇÃO INICIAL DO PI SYSTEM")
+print("=" * 60)
+print()
 
 # ==================================================
 # PROCURAR AF SDK
 # ==================================================
+
+print("[ETAPA 1] Procurando AF SDK...")
+print()
 
 possiveis_caminhos = [
     r"C:\Program Files (x86)\PIPC\AF\PublicAssemblies\4.0\OSIsoft.AFSDK.dll",
@@ -15,22 +30,28 @@ afsdk_dll = None
 
 for caminho in possiveis_caminhos:
 
+    print(f"Verificando: {caminho}")
+
     if os.path.exists(caminho):
         afsdk_dll = caminho
         break
 
 if afsdk_dll is None:
 
-    print("\n[ERRO]")
-    print("OSIsoft.AFSDK.dll não encontrada.")
+    print()
+    print("[ERRO] AF SDK não encontrada.")
     quit()
 
-print(f"\n[OK] AF SDK encontrada:")
+print()
+print("[OK] AF SDK encontrada")
 print(afsdk_dll)
 
 # ==================================================
-# CARREGAR SDK
+# CARREGAR AF SDK
 # ==================================================
+
+print()
+print("[ETAPA 2] Carregando AF SDK...")
 
 try:
 
@@ -38,70 +59,76 @@ try:
 
     clr.AddReference(afsdk_dll)
 
-    print("\n[OK] AF SDK carregada")
+    print("[OK] AF SDK carregada")
 
 except Exception as erro:
 
-    print("\n[ERRO] Falha ao carregar AF SDK")
+    print()
+    print("[ERRO] Falha ao carregar AF SDK")
     print(erro)
+
     quit()
 
 # ==================================================
-# LISTAR SERVIDORES PI
+# LISTAR SERVIDORES
 # ==================================================
 
-from OSIsoft.AF.PI import PIServers
+print()
+print("[ETAPA 3] Obtendo lista de servidores PI...")
 
-servidores = PIServers()
+try:
 
-print("\nServidores encontrados:\n")
+    from OSIsoft.AF.PI import PIServers
+
+    servidores = PIServers()
+
+    print("[OK] PIServers carregado")
+
+except Exception as erro:
+
+    print()
+    print("[ERRO] Falha ao carregar lista de servidores")
+    print(erro)
+
+    quit()
 
 lista_servidores = []
 
-for servidor in servidores:
+print()
+print("Enumerando servidores disponíveis...")
+print()
 
-    lista_servidores.append(servidor.Name)
-
-for i, nome in enumerate(lista_servidores, start=1):
-
-    print(f"{i} - {nome}")
-
-# ==================================================
-# TESTAR CONEXÃO
-# ==================================================
-
-pi_server = None
-
-for nome in lista_servidores:
+for i, servidor in enumerate(servidores, start=1):
 
     try:
 
-        servidor = servidores[nome]
+        nome = servidor.Name
 
-        servidor.Connect()
+        lista_servidores.append(nome)
 
-        pi_server = nome
+        print(f"{i} - {nome}")
 
-        print(f"\n[OK] Conectado em: {nome}")
+    except Exception as erro:
 
-        break
+        print(
+            f"[ERRO] Falha ao obter servidor {i}"
+        )
 
-    except:
-        pass
-
-if pi_server is None:
-
-    print("\n[ERRO]")
-    print("Nenhum PI Server acessível.")
-    quit()
+print()
+print(
+    f"[OK] {len(lista_servidores)} servidores encontrados"
+)
 
 # ==================================================
 # CRIAR CONFIG
 # ==================================================
 
+print()
+print("[ETAPA 4] Gerando configuração...")
+
 config = {
     "afsdk_dll": afsdk_dll,
-    "pi_server": pi_server
+    "pi_servers": lista_servidores
 }
 
 Path("config").mkdir(
@@ -122,5 +149,49 @@ with open(
         ensure_ascii=False
     )
 
-print("\n[OK] Configuração criada:")
-print("config/config.json")
+print("[OK] config/config.json criado")
+
+# ==================================================
+# RESUMO FINAL
+# ==================================================
+
+fim = datetime.now()
+
+print()
+print("=" * 60)
+print("CONFIGURAÇÃO FINALIZADA")
+print("=" * 60)
+print()
+
+print("AF SDK:")
+
+print(
+    afsdk_dll
+)
+
+print()
+
+print(
+    f"Servidores encontrados: "
+    f"{len(lista_servidores)}"
+)
+
+print()
+
+print(
+    f"Tempo total: "
+    f"{fim - inicio}"
+)
+
+print()
+
+print(
+    "Arquivo criado:"
+)
+
+print(
+    "config/config.json"
+)
+
+print()
+print("=" * 60)

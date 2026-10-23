@@ -1,34 +1,92 @@
 import csv
-
-from lib.pi_connection import conectar_pi
+from datetime import datetime
 
 import clr
 
 from lib.config_manager import carregar_config
+from lib.pi_connection import selecionar_servidor
+
+# ==========================================
+# INÍCIO
+# ==========================================
+
+inicio = datetime.now()
+
+print("=" * 60)
+print("BUSCA DE TAGS")
+print("=" * 60)
+print()
+
+# ==========================================
+# CARREGAR CONFIGURAÇÃO
+# ==========================================
+
+print("Carregando configuração...")
 
 cfg = carregar_config()
+
+print("[OK] Configuração carregada")
+
+# ==========================================
+# CARREGAR AF SDK
+# ==========================================
+
+print()
+print("Carregando AF SDK...")
 
 clr.AddReference(
     cfg["afsdk_dll"]
 )
 
+print("[OK] AF SDK carregada")
+
+# ==========================================
+# IMPORTAR PI
+# ==========================================
+
 from OSIsoft.AF.PI import PIPoint
 
-server = conectar_pi()
+# ==========================================
+# ESCOLHER SERVIDOR
+# ==========================================
 
-print(f"Conectado em: {server.Name}")
+server = selecionar_servidor()
+
+print()
+print(f"[OK] Conectado em: {server.Name}")
+print()
+
+# ==========================================
+# CARREGAR EQUIPAMENTOS
+# ==========================================
+
+print("Carregando equipamentos...")
 
 with open(
     "templates/equipamentos.txt",
     "r",
     encoding="utf-8"
-) as f:
+) as arquivo:
 
     equipamentos = [
         linha.strip()
-        for linha in f
+        for linha in arquivo
         if linha.strip()
     ]
+
+total = len(equipamentos)
+
+print(
+    f"[OK] {total} equipamentos carregados"
+)
+
+print()
+
+# ==========================================
+# PROCESSAMENTO
+# ==========================================
+
+total_tags = 0
 
 with open(
     "resultado_tags.csv",
@@ -47,29 +105,76 @@ with open(
         "Tag"
     ])
 
-    for equipamento in equipamentos:
+    for i, equipamento in enumerate(
+        equipamentos,
+        start=1
+    ):
+
+        print("-" * 60)
 
         print(
-            f"\nPesquisando: {equipamento}"
+            f"[{i}/{total}] "
+            f"Pesquisando: {equipamento}"
         )
 
-        tags = list(
-            PIPoint.FindPIPoints(
-                server,
-                f"{equipamento}*"
+        try:
+
+            tags = list(
+                PIPoint.FindPIPoints(
+                    server,
+                    f"{equipamento}*"
+                )
             )
-        )
 
-        print(
-            f"Encontradas: {len(tags)}"
-        )
+            qtd = len(tags)
 
-        for tag in tags:
+            total_tags += qtd
 
-            writer.writerow([
-                equipamento,
-                tag.Name
-            ])
+            print(
+                f"Encontradas: {qtd} | "
+                f"Acumulado: {total_tags}"
+            )
 
-print("\nConcluído!")
-print("Arquivo gerado: resultado_tags.csv")
+            for tag in tags:
+
+                writer.writerow([
+                    equipamento,
+                    tag.Name
+                ])
+
+        except Exception as erro:
+
+            print(
+                f"[ERRO] {equipamento}"
+            )
+
+            print(erro)
+
+# ==========================================
+# FINAL
+# ==========================================
+
+fim = datetime.now()
+
+print()
+print("=" * 60)
+print("PROCESSAMENTO CONCLUÍDO")
+print("=" * 60)
+
+print(
+    f"Equipamentos processados : {total}"
+)
+
+print(
+    f"Tags encontradas        : {total_tags}"
+)
+
+print(
+    "Arquivo gerado          : resultado_tags.csv"
+)
+
+print(
+    f"Tempo total             : {fim - inicio}"
+)
+
+print("=" * 60)
